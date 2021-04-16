@@ -1,26 +1,30 @@
 package com.game.trial.base.gameDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.game.trial.base.IResponse;
 import com.game.trial.base.gameDetails.turn.PlayerTurn;
 
 import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 
+public class GameWaitingStart implements IResponse {
 
-public class GameWaitingStart {
+
     private String id;
     private int sideSize;
     private int pointsToWin;
-    private LocalDateTime burningTime;
+    @JsonIgnore
+    private LocalDateTime expired;
     private ArrayDeque<Player> players;
 
-    public GameWaitingStart(String id, int sideSize, int pointsToWin, Player player) {
+    public GameWaitingStart(String id, int sideSize, int pointsToWin, Player player, LocalDateTime expired) {
         this.id = id;
-        this.players = new ArrayDeque<>();
+        this.expired = expired;
         this.sideSize = sideSize;
         this.pointsToWin = pointsToWin;
+        this.players = new ArrayDeque<>();
         players.add(player);
         player.setPlayerTurn(PlayerTurn.PLAYER_FIRST);
-        burningTime = LocalDateTime.now().plusMinutes(5);
     }
 
     public String getId() {
@@ -56,7 +60,7 @@ public class GameWaitingStart {
     }
 
     public boolean isExpired() {
-        return burningTime.isBefore(LocalDateTime.now());
+        return expired.isBefore(LocalDateTime.now());
     }
 
     public void addPlayer(Player p) {

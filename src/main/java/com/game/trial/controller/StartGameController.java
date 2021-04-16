@@ -3,7 +3,6 @@ package com.game.trial.controller;
 import com.game.trial.base.IResponse;
 import com.game.trial.base.Session;
 import com.game.trial.base.gameDetails.GameWaitingStart;
-import com.game.trial.base.gameDetails.Player;
 import com.game.trial.request.GameRegisterRequest;
 import com.game.trial.request.JoinGameRequest;
 import com.game.trial.request.TurnRequest;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 
 
 @RestController
@@ -33,6 +33,7 @@ public class StartGameController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<IResponse> regGame(@RequestBody GameRegisterRequest settings) {
+        System.out.println("controller::regGame player:" + session.getPlayer());
         settings.setPlayer(session.getPlayer());
         String gameId = gameValidatorService.registerNewGame(settings);
 
@@ -46,6 +47,11 @@ public class StartGameController {
         gameEngine.createNewGame(gameWaitingStart);
 
         return ResponseEntity.status(HttpStatus.OK).body(new ResponseTemplate(true).addHint("gameId", gameWaitingStart.getId()));
+    }
+
+    @GetMapping(value = "/avaliablelist")
+    public ResponseEntity<List<IResponse>> getActiveGames() {
+        return new ResponseEntity<>(gameValidatorService.getActiveGamesWaitingStart(), HttpStatus.OK);
     }
 
 

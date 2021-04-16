@@ -16,23 +16,24 @@ public class GameEngine {
 
     // TODO: 14.04.2021 deleting last requests
     // TODO: 14.04.2021  Сделать бы только безопасную коллекцию либо реализовать её синхронизацию
-    private final Map<String, XOGame> duringGame;
+    private final Map<String, XOGame> games;
     private final Processor processor;
 
     public GameEngine(@Autowired Processor processor) {
-        this.duringGame = new HashMap<>();
+        this.games = new HashMap<>();
         this.processor = processor;
     }
 
     public void createNewGame(GameWaitingStart game) {
         XOGame xo = new XOGame(game.getId(), game.getSideSize(), game.getPointsToWin(), game.getPlayers());
-        synchronized (duringGame) {
-            duringGame.put(game.getId(), xo);
+        synchronized (games) {
+            games.put(game.getId(), xo);
         }
     }
 
     public boolean makeStep(String gameId, Step step, Player player) {
-        XOGame game = duringGame.get(gameId);
+        XOGame game = games.get(gameId);
+        // TODO: 17.04.2021 throw exception if game == null 
         return game.makeStep(step, player, processor);
     }
 }

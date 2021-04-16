@@ -34,21 +34,19 @@ public class Battlefield {
     }
 
     protected boolean makeTurn(Step step, PlayerSymbol symbol, Processor processor) {
-        if (battleField[step.getxAxis()][step.getyAxis()] == null) {
+        if (battleField[step.getyAxis()][step.getxAxis()] == null) {
             synchronized (battleField) {
-                battleField[step.getxAxis()][step.getyAxis()] = symbol;
+                battleField[step.getyAxis()][step.getxAxis()] = symbol;
                 turnsCount++;
             }
             processor.checkBF(this);
             temporal();
             return true;
         }
-        // TODO: 15.04.2021 add exception
         return false;
     }
 
     public void temporal() {
-        Integer[][][][] test = new Integer[10][10][10][10];
 
         System.out.println("TurnsCount = " + turnsCount);
         for (int x = 0; x < battleField.length; x++) {

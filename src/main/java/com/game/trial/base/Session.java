@@ -10,12 +10,13 @@ public class Session {
 
     private Player player;
 
-
     public Player getPlayer() {
         return player;
     }
-
     public void setPlayer(Player player) {
         this.player = player;
+    }
+    public boolean isPlayerValid() {
+        return player != null && player.getName().length() > 0;
     }
 }

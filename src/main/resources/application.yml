@@ -1,0 +1,5 @@
+project:
+  session:
+    max-interval-in-seconds: 600
+  xo:
+    wait-player-lifecycle-in-seconds: 120
