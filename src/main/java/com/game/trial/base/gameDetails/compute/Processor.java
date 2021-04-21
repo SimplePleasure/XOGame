@@ -1,6 +1,5 @@
 package com.game.trial.base.gameDetails.compute;
 
-import com.game.trial.base.gameDetails.Battlefield;
 import com.game.trial.base.gameDetails.turn.PlayerSymbol;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,14 +22,12 @@ public class Processor {
         directions.add(topRightToBelowLeft);
     }
 
-    public PlayerSymbol checkBF(Battlefield bf) {
-        for (Direction d : directions) {
-            PlayerSymbol ps = d.hasWinner(bf);
-            if (ps != null) {
-                System.err.println("WINNER!:))");
-                return ps;
-            }
+    // TODO: 17.04.2021 fix returned value as class which will save result from winner check
+    public ResultCheck checkBF(PlayerSymbol[][] bf, int pointsCountToWin) {
+        ResultCheck check = new ResultCheck(bf, pointsCountToWin);
+        for (Direction direction : directions) {
+            direction.hasWinner(check);
         }
-        return null;
+        return check;
     }
 }

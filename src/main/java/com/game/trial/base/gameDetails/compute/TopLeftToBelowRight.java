@@ -1,6 +1,5 @@
 package com.game.trial.base.gameDetails.compute;
 
-import com.game.trial.base.gameDetails.Battlefield;
 import com.game.trial.base.gameDetails.turn.PlayerSymbol;
 import org.springframework.stereotype.Component;
 
@@ -8,8 +7,10 @@ import org.springframework.stereotype.Component;
 public class TopLeftToBelowRight implements Direction {
 
     @Override
-    public PlayerSymbol hasWinner(Battlefield game) {
-        PlayerSymbol[][] bf = game.getBattleField();
+    public ResultCheck hasWinner(ResultCheck check) {
+        PlayerSymbol[][] bf = check.getBattlefield();
+        int pointCountToWin = check.getScoresToWin();
+
         int xPoints = 0;
         int oPoints = 0;
         int startXPosition = bf.length -1;
@@ -28,8 +29,9 @@ public class TopLeftToBelowRight implements Direction {
                     xPoints = 0;
                     oPoints++;
                 }
-                if (xPoints == game.getPointsToWin()) return PlayerSymbol.X;
-                if (oPoints == game.getPointsToWin()) return PlayerSymbol.O;
+                if (xPoints == pointCountToWin) return check.setWinnerSymbol(PlayerSymbol.X);
+                if (oPoints == pointCountToWin) return check.setWinnerSymbol(PlayerSymbol.O);
+
                 x--;
             }
             xPoints = 0;
@@ -49,13 +51,14 @@ public class TopLeftToBelowRight implements Direction {
                     xPoints = 0;
                     oPoints++;
                 }
-                if (oPoints == game.getPointsToWin()) return PlayerSymbol.O;
+                if (xPoints == pointCountToWin) return check.setWinnerSymbol(PlayerSymbol.X);
+                if (oPoints == pointCountToWin) return check.setWinnerSymbol(PlayerSymbol.O);
                 y++;
             }
             xPoints = 0;
             oPoints = 0;
             y = ++startYPosition;
         }
-        return null;
+        return check;
     }
 }

@@ -16,7 +16,5 @@ public class Session {
     public void setPlayer(Player player) {
         this.player = player;
     }
-    public boolean isPlayerValid() {
-        return player != null && player.getName().length() > 0;
-    }
+
 }

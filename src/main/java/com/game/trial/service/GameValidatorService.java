@@ -1,10 +1,12 @@
 package com.game.trial.service;
 
+import com.game.trial.base.IContain;
 import com.game.trial.base.IResponse;
 import com.game.trial.base.gameDetails.GameWaitingStart;
-import com.game.trial.base.gameDetails.Player;
-import com.game.trial.exception.exceptions.GameJoiningException;
+import com.game.trial.base.gameDetails.compute.ValidationStatus;
+import com.game.trial.exception.exceptions.NonExistentGameException;
 import com.game.trial.request.GameRegisterRequest;
+import com.game.trial.request.JoinGameRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -21,12 +23,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 @Service
-public class GameValidatorService {
+public class GameValidatorService implements IContain {
 
     @Value("${project.xo.wait-player-lifecycle-in-seconds}")
     private int lifecycleInSeconds;
 
-    // TODO: 14.04.2021 deleting last requests
     private HashMap<String, GameWaitingStart> gamesWaitingPlayers;
     private final Lock lock;
     private final Condition condition;
@@ -43,28 +44,24 @@ public class GameValidatorService {
 
     public void checkGames() {
         for (; ; ) {
-            System.err.println("\t -------> GameValidatorService#checkGames invoke lock");
             lock.lock();
             try {
                 try {
                     if (gamesWaitingPlayers.size() > 0) {
-                        System.out.println("\t -------> await " + lifecycleInSeconds);
                         condition.await(lifecycleInSeconds, TimeUnit.SECONDS);
                     } else {
-                        System.out.println("\t -------> await out of time");
                         condition.await();
                     }
                 } catch (InterruptedException e) {
                     continue;
                 }
-                System.out.println("\t -------> GameValidatorService thread start cleaning. map size:" + gamesWaitingPlayers.size());
                 gamesWaitingPlayers.entrySet()
                         .stream()
                         .filter(x -> x.getValue().isExpired())
+                        .peek(x -> x.getValue().setPlayerGameStatusFalse())
                         .forEach(x -> gamesWaitingPlayers.remove(x.getKey()));
 
             } finally {
-                System.err.println("\t -------> GameValidatorService#checkGames invoke unlock");
                 lock.unlock();
             }
         }
@@ -77,7 +74,7 @@ public class GameValidatorService {
                 .collect(Collectors.toList());
     }
 
-    public String registerNewGame(GameRegisterRequest gr) {
+    public IResponse registerNewGame(GameRegisterRequest gr) {
         LocalDateTime expired = LocalDateTime.now().plusSeconds(lifecycleInSeconds);
         GameWaitingStart gw = new GameWaitingStart(UUID.randomUUID().toString().substring(0, 8),
                 gr.getGamePrefs().getSideSize(), gr.getGamePrefs().getPointsToWin(), gr.getPlayer(), expired);
@@ -88,22 +85,40 @@ public class GameValidatorService {
         } finally {
             lock.unlock();
         }
-        return gw.getId();
+        return gw;
     }
 
-    public GameWaitingStart joinToTheGame(Player player, String gameId) {
+    public GameWaitingStart joinToTheGame(JoinGameRequest request) {
         GameWaitingStart gw;
+
         lock.lock();
         try {
-            gw = gamesWaitingPlayers.get(gameId);
+            gw = gamesWaitingPlayers.get(request.getGameId());
             if (gw == null) {
-                throw new GameJoiningException();
+                throw new NonExistentGameException();
             }
-            gamesWaitingPlayers.remove(gameId);
+            gamesWaitingPlayers.remove(request.getGameId());
         } finally {
             lock.unlock();
         }
-        gw.addPlayer(player);
+        gw.addPlayer(request.getPlayer());
         return gw;
+    }
+
+
+    @Override
+    public boolean isContainRecord(String gameId) {
+        return gamesWaitingPlayers.containsKey(gameId);
+    }
+
+    @Override
+    public ValidationStatus getGameInfo(String gameId) {
+        GameWaitingStart game = gamesWaitingPlayers.get(gameId);
+        return new ValidationStatus()
+                .setFieldSize(game.getSideSize())
+                .setPointsToWin(game.getPointsToWin())
+                .setGameWaitingTime(game.waitingTimeSeconds());
+
+
     }
 }

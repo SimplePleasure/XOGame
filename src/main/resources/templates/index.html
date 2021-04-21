@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+    <script src="js/main.js"></script>
+    <link href="css/style.css" rel="stylesheet" type="text/css"/>
     <meta charset="UTF-8">
     <title>main</title>
 </head>
 <body>
+    <div id="create-game">
+        <form>
+            <table>
+                <tr>
+                    <td colspan="2" align="center"><a3>Create new game</a3></td>
+                </tr>
+                <tr>
+                    <td align="center">size</td><td><input id="side-size-num" name="side-size" type="number"></td>
+                </tr>
+                <tr>
+                    <td align="center">score</td><td><input id="points-count-num" name="points-count" type="number"></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="right"><input id="create-game-btn" align="right" type="button" value="create"></td>
+                </tr>
+            </table>
+        </form>
 
+<!--        <form>-->
+<!--            <a3>Create new game</a3>-->
+<!--            <input id="side-size-num" name="side-size" type="number">-->
+<!--            <input id="points-count-num" name="points-count" type="number">-->
+<!--            <input id="create-game-btn" type="button" value="create">-->
+<!--        </form>-->
+    </div>
+
+
+
+    <table id="game-list">
+        <tr>
+            <th>game's id</th><th>field size</th><th>points to win</th>
+        </tr>
+        <tr th:each="game: ${games}">
+            <td th:text="${game.getId()}"></td><td th:text="${game.getSideSize()}" align="center"></td><td th:text="${game.getPointsToWin()}" align="center"></td>
+        </tr>
+    </table>
 </body>
 </html>

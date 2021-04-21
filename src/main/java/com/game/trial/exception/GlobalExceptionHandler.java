@@ -1,7 +1,9 @@
 package com.game.trial.exception;
 
 import com.game.trial.base.IResponse;
-import com.game.trial.exception.exceptions.GameJoiningException;
+import com.game.trial.exception.exceptions.ChoosedPointIsBusyException;
+import com.game.trial.exception.exceptions.NonExistentGameException;
+import com.game.trial.exception.exceptions.WrongUserTurn;
 import com.game.trial.response.ResponseTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,13 +15,17 @@ import org.springframework.web.context.request.WebRequest;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler({GameJoiningException.class})
+    @ExceptionHandler({NonExistentGameException.class, WrongUserTurn.class, ChoosedPointIsBusyException.class})
     public final ResponseEntity<IResponse> handleException(Exception ex, WebRequest request) {
         HttpHeaders headers = new HttpHeaders();
-        if (ex instanceof GameJoiningException) {
+        if (ex instanceof NonExistentGameException) {
+            NonExistentGameException e = (NonExistentGameException) ex;
             HttpStatus status = HttpStatus.NOT_FOUND;
-            GameJoiningException e = (GameJoiningException) ex;
             return handleGameJoiningException(status, request, headers);
+        } else if (ex instanceof WrongUserTurn) {
+            return handleEx(new ResponseTemplate(false), HttpStatus.BAD_REQUEST, headers);
+        } else if (ex instanceof ChoosedPointIsBusyException) {
+            return handleEx(new ResponseTemplate(false), HttpStatus.BAD_REQUEST, headers);
         } else {
             ResponseTemplate body = new ResponseTemplate(false);
             body.addHint("unexpected error", ex.getLocalizedMessage());
