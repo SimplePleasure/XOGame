@@ -7,6 +7,8 @@ import com.game.trial.base.gameDetails.compute.ValidationStatus;
 import com.game.trial.exception.exceptions.NonExistentGameException;
 import com.game.trial.request.GameRegisterRequest;
 import com.game.trial.request.JoinGameRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +34,7 @@ public class GameValidatorService implements IContain {
     private final Lock lock;
     private final Condition condition;
     private ExecutorService scheduler;
+    private Logger logger = LoggerFactory.getLogger(GameValidatorService.class);
 
 
     public GameValidatorService() {
@@ -44,26 +47,31 @@ public class GameValidatorService implements IContain {
 
     public void checkGames() {
         for (; ; ) {
+            logger.info("1-------->  lock");
             lock.lock();
             try {
                 try {
                     if (gamesWaitingPlayers.size() > 0) {
+                        logger.info("2-------->  await with timer");
                         condition.await(lifecycleInSeconds, TimeUnit.SECONDS);
                     } else {
+                        logger.info("2-------->  await");
                         condition.await();
                     }
                 } catch (InterruptedException e) {
                     continue;
                 }
+                logger.info("3-------->  clean map. size: " + gamesWaitingPlayers.size());
                 gamesWaitingPlayers.entrySet()
                         .stream()
                         .filter(x -> x.getValue().isExpired())
                         .peek(x -> x.getValue().setPlayerGameStatusFalse())
                         .forEach(x -> gamesWaitingPlayers.remove(x.getKey()));
-
+                logger.info("cleaning complete. map size: " + gamesWaitingPlayers.size());
             } finally {
                 lock.unlock();
             }
+            logger.info("4-------> unlock");
         }
     }
 
@@ -115,10 +123,9 @@ public class GameValidatorService implements IContain {
     public ValidationStatus getGameInfo(String gameId) {
         GameWaitingStart game = gamesWaitingPlayers.get(gameId);
         return new ValidationStatus()
+                .setGameId(gameId)
                 .setFieldSize(game.getSideSize())
                 .setPointsToWin(game.getPointsToWin())
                 .setGameWaitingTime(game.waitingTimeSeconds());
-
-
     }
 }

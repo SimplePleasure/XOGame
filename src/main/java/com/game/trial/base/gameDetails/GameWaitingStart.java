@@ -56,7 +56,7 @@ public class GameWaitingStart implements IResponse {
         return expired.isBefore(LocalDateTime.now());
     }
     public int waitingTimeSeconds() {
-         return (int)Duration.between(expired, LocalDateTime.now()).getSeconds();
+         return (int)Duration.between(LocalDateTime.now(), expired).getSeconds();
     }
     public void addPlayer(Player p) {
         p.setPlayerTurn(PlayerTurn.PLAYER_SECOND);

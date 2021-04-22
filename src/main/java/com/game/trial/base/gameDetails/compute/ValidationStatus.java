@@ -6,6 +6,7 @@ import com.game.trial.base.IResponse;
 public class ValidationStatus implements IResponse {
 
 
+    private String gameId;
     @JsonProperty("field-size")
     private int fieldSize;
     @JsonProperty("points-to-win")
@@ -13,6 +14,10 @@ public class ValidationStatus implements IResponse {
     @JsonProperty(value = "game-waiting-start")
     private int gameWaitingTime;
 
+    public ValidationStatus setGameId(String gameId) {
+        this.gameId = gameId;
+        return this;
+    }
     public ValidationStatus setFieldSize(int fieldSize) {
         this.fieldSize = fieldSize;
         return this;
@@ -24,6 +29,10 @@ public class ValidationStatus implements IResponse {
     public ValidationStatus setGameWaitingTime(int gameWaitingTime) {
         this.gameWaitingTime = gameWaitingTime;
         return this;
+    }
+
+    public String getGameId() {
+        return gameId;
     }
 
     public int getFieldSize() {

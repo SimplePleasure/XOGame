@@ -40,80 +40,13 @@ $(document).ready(function(){
 
 
 
-});
-
-
-
-
-
-//$(document).ready(function(){
+//    setTimeout(response.id, 1000);
+//    function checkGameStatus(gameId) {
+//        $.ajax({
+//            method: "GET",
 //
-//    $('#create-game-btn').click( function() {
-//
-//         var dataArray = $('#create-game form').serializeArray();
-//         var json = {};
-//         $(dataArray).each(function(index, obj) {
-//         json[obj.name] = obj.value;
-//         });
-//
-//         var finalObj = {
-//            "gamePrefs": json
-//         };
-//         console.log(finalObj);
-//
-//         let
-//
-//         $.ajax({
-//            method: "POST",
-//            contentType: "application/json",
-//            url: "/register",
-//            data: finalObj,
-//            success: function() {
-//                alert('success');
-//            }
-//         });
-//
-//
-////      var side = $('#side-size-num').val();
-////      var pointsCount = $('#points-count-num').val();
-////      var prefs = {
-////        "side-size": side,
-////        "points-count": pointsCount
-////      };
-////      var obj = {
-////        gamePrefs: prefs
-////      };
-////      console.log(obj);
-////
-////      $.ajax({
-////         method: "POST",
-////         contentType: "application/json",
-////         url: "/register",
-////         data: obj,
-////         success: function() {
-////             alert('success');
-////         }
-////      });
-//
-//
-//
-//
-//
-//    });
-//
-//
-//
-//    function getFormData($form) {
-//        var unindexed_array = $form.serializeArray();
-//        var indexed_array = {};
-//
-//        $.map(unindexed_array, function(n, i){
-//            indexed_array[n['name']] = n['value'];
 //        });
-//
-//        return indexed_array;
 //    }
-//
-//
-//
-//});
+
+
+});
