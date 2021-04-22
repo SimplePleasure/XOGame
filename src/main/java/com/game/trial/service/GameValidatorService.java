@@ -59,7 +59,7 @@ public class GameValidatorService implements IContain {
                         condition.await();
                     }
                 } catch (InterruptedException e) {
-                    continue;
+                    e.printStackTrace();
                 }
                 logger.info("3-------->  clean map. size: " + gamesWaitingPlayers.size());
                 gamesWaitingPlayers.entrySet()
