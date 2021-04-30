@@ -4,7 +4,7 @@
 
     position: fixed;
     top: 5%;
-    right: 10%
+    left: 10%
 }
 
 #game-list TD, TH {
@@ -18,14 +18,32 @@
 #create-game {
         position: relative;
         top: 50px;
-        left: 55%;
+        left: 35%;
 }
 
 #create-game-btn {
       margin-right: 5px;
 }
 
-#game-list {
+#myGame {
+    position: relative;
+    top: 50px;
+    left: 35%;
+}
+
+#myGame table{
+    padding: 3px; /* Поля вокруг содержимого таблицы */
+    border: 1px solid #673AB7; /* Параметры рамки */
+    text-align: center; /* Выравнивание по левому краю */
+}
+
+.gameSample:hover {
+    background: rgba(180, 180, 180, 0.5);
+}
+
+.pane:hover {
+    background: rgba(180, 180, 180, 0.5);
+}
 
 
 

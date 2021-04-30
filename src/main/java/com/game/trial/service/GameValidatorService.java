@@ -7,18 +7,12 @@ import com.game.trial.base.gameDetails.compute.ValidationStatus;
 import com.game.trial.exception.exceptions.NonExistentGameException;
 import com.game.trial.request.GameRegisterRequest;
 import com.game.trial.request.JoinGameRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -33,45 +27,40 @@ public class GameValidatorService implements IContain {
     private HashMap<String, GameWaitingStart> gamesWaitingPlayers;
     private final Lock lock;
     private final Condition condition;
-    private ExecutorService scheduler;
-    private Logger logger = LoggerFactory.getLogger(GameValidatorService.class);
+    private final ExecutorService expiredFilesCleaner;
 
 
     public GameValidatorService() {
         this.gamesWaitingPlayers = new HashMap<>();
         lock = new ReentrantLock();
         condition = lock.newCondition();
-        scheduler = Executors.newSingleThreadExecutor();
-        scheduler.submit(this::checkGames);
+        expiredFilesCleaner = Executors.newSingleThreadExecutor();
+        expiredFilesCleaner.submit(this::checkGames);
     }
 
     public void checkGames() {
         for (; ; ) {
-            logger.info("1-------->  lock");
             lock.lock();
             try {
                 try {
                     if (gamesWaitingPlayers.size() > 0) {
-                        logger.info("2-------->  await with timer");
                         condition.await(lifecycleInSeconds, TimeUnit.SECONDS);
                     } else {
-                        logger.info("2-------->  await");
                         condition.await();
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                logger.info("3-------->  clean map. size: " + gamesWaitingPlayers.size());
-                gamesWaitingPlayers.entrySet()
+                List<String> list = gamesWaitingPlayers.entrySet()
                         .stream()
                         .filter(x -> x.getValue().isExpired())
                         .peek(x -> x.getValue().setPlayerGameStatusFalse())
-                        .forEach(x -> gamesWaitingPlayers.remove(x.getKey()));
-                logger.info("cleaning complete. map size: " + gamesWaitingPlayers.size());
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+                list.forEach(x -> gamesWaitingPlayers.remove(x));
             } finally {
                 lock.unlock();
             }
-            logger.info("4-------> unlock");
         }
     }
 
@@ -98,7 +87,6 @@ public class GameValidatorService implements IContain {
 
     public GameWaitingStart joinToTheGame(JoinGameRequest request) {
         GameWaitingStart gw;
-
         lock.lock();
         try {
             gw = gamesWaitingPlayers.get(request.getGameId());
@@ -122,6 +110,9 @@ public class GameValidatorService implements IContain {
     @Override
     public ValidationStatus getGameInfo(String gameId) {
         GameWaitingStart game = gamesWaitingPlayers.get(gameId);
+        if (!Objects.nonNull(game)) {
+            throw new NonExistentGameException();
+        }
         return new ValidationStatus()
                 .setGameId(gameId)
                 .setFieldSize(game.getSideSize())

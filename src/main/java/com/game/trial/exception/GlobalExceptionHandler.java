@@ -23,9 +23,9 @@ public class GlobalExceptionHandler {
             HttpStatus status = HttpStatus.NOT_FOUND;
             return handleGameJoiningException(status, request, headers);
         } else if (ex instanceof WrongUserTurn) {
-            return handleEx(new ResponseTemplate(false), HttpStatus.BAD_REQUEST, headers);
+            return handleEx(new ResponseTemplate(false).addHint("queue error", ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST, headers);
         } else if (ex instanceof ChoosedPointIsBusyException) {
-            return handleEx(new ResponseTemplate(false), HttpStatus.BAD_REQUEST, headers);
+            return handleEx(new ResponseTemplate(false).addHint("window is busy", ex.getLocalizedMessage()), HttpStatus.BAD_REQUEST, headers);
         } else {
             ResponseTemplate body = new ResponseTemplate(false);
             body.addHint("unexpected error", ex.getLocalizedMessage());

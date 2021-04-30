@@ -1,5 +1,8 @@
-package com.game.trial.request.base;
+package com.game.trial.request;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class Step {
 
     private int xAxis;

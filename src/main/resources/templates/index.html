@@ -26,23 +26,22 @@
             </table>
         </form>
 
-<!--        <form>-->
-<!--            <a3>Create new game</a3>-->
-<!--            <input id="side-size-num" name="side-size" type="number">-->
-<!--            <input id="points-count-num" name="points-count" type="number">-->
-<!--            <input id="create-game-btn" type="button" value="create">-->
-<!--        </form>-->
     </div>
 
 
 
-    <table id="game-list">
+    <table id="game-list" class="gameList">
+        <tr><th colspan="3" align="center">Games waiting players</th></tr>
         <tr>
             <th>game's id</th><th>field size</th><th>points to win</th>
         </tr>
-        <tr th:each="game: ${games}">
+        <tr th:class="gameSample" th:each="game: ${games}">
             <td th:text="${game.getId()}"></td><td th:text="${game.getSideSize()}" align="center"></td><td th:text="${game.getPointsToWin()}" align="center"></td>
         </tr>
     </table>
+
+
+    <span id="myGame"></span>
+
 </body>
 </html>

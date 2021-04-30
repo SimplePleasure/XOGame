@@ -2,4 +2,6 @@ project:
   session:
     max-interval-in-seconds: 600
   xo:
-    wait-player-lifecycle-in-seconds: 10
+    wait-player-lifecycle-in-seconds: 60
+server:
+  port: 5000

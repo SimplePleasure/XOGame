@@ -22,9 +22,8 @@ public class Processor {
         directions.add(topRightToBelowLeft);
     }
 
-    // TODO: 17.04.2021 fix returned value as class which will save result from winner check
-    public ResultCheck checkBF(PlayerSymbol[][] bf, int pointsCountToWin) {
-        ResultCheck check = new ResultCheck(bf, pointsCountToWin);
+    public ResultCheck checkBF(PlayerSymbol[][] bf, int pointsCountToWin, int availableTurns) {
+        ResultCheck check = new ResultCheck(bf, pointsCountToWin, availableTurns);
         for (Direction direction : directions) {
             direction.hasWinner(check);
         }

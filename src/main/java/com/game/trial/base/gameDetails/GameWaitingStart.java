@@ -25,7 +25,7 @@ public class GameWaitingStart implements IResponse {
         this.pointsToWin = pointsToWin;
         this.players = new ArrayDeque<>();
         players.add(player);
-        player.setPlayerTurn(PlayerTurn.PLAYER_FIRST);
+        player.setGame(id, PlayerTurn.PLAYER_FIRST);
     }
 
     public String getId() {
@@ -59,7 +59,7 @@ public class GameWaitingStart implements IResponse {
          return (int)Duration.between(LocalDateTime.now(), expired).getSeconds();
     }
     public void addPlayer(Player p) {
-        p.setPlayerTurn(PlayerTurn.PLAYER_SECOND);
+        p.setGame(id, PlayerTurn.PLAYER_SECOND);
         players.add(p);
     }
     public void setPlayerGameStatusFalse() {

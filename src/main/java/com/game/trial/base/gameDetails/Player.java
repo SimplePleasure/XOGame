@@ -5,7 +5,9 @@ import com.game.trial.base.gameDetails.turn.PlayerTurn;
 public class Player {
 
     private String name;
+
     private boolean inGame;
+    private String gameId;
     private PlayerTurn playerTurn;
 
     public Player() {
@@ -15,7 +17,6 @@ public class Player {
     public Player(String name) {
         this.name = name;
     }
-
     public String getName() {
         return name;
     }
@@ -23,17 +24,23 @@ public class Player {
         this.name = name;
     }
 
+
     protected PlayerTurn getPlayerTurn() {
         return playerTurn;
     }
-    protected void setPlayerTurn(PlayerTurn playerTurn) {
+    public boolean isInGame() {
+        return inGame;
+    }
+    public String getGameId() {
+        return gameId;
+    }
+
+    protected void setGame(String gameId, PlayerTurn playerTurn) {
+        this.gameId = gameId;
         this.playerTurn = playerTurn;
         inGame = true;
     }
 
-    public boolean isInGame() {
-        return inGame;
-    }
     public void setInGameFalse() {
         inGame = false;
         playerTurn = null;

@@ -1,5 +1,6 @@
 package com.game.trial.controller;
 
+import com.game.trial.base.IContain;
 import com.game.trial.base.IResponse;
 import com.game.trial.base.Session;
 import com.game.trial.base.gameDetails.GameWaitingStart;
@@ -7,7 +8,7 @@ import com.game.trial.base.gameDetails.compute.ResultCheck;
 import com.game.trial.exception.exceptions.NonExistentGameException;
 import com.game.trial.request.GameRegisterRequest;
 import com.game.trial.request.JoinGameRequest;
-import com.game.trial.request.TurnRequest;
+import com.game.trial.request.Step;
 import com.game.trial.response.ResponseTemplate;
 import com.game.trial.service.GameEngineService;
 import com.game.trial.service.GameValidatorService;
@@ -50,35 +51,36 @@ public class StartGameController {
 
     @PostMapping(value = "/join")
     public ResponseEntity<IResponse> joinGame(@RequestBody JoinGameRequest join) {
-//        if (session.getPlayer() == null || session.getPlayer().isInGame()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseTemplate(false)
-//                      .addHint("player", "player must be authenticated and finish all games"));
-//        }
+        if (session.getPlayer() == null || session.getPlayer().isInGame()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseTemplate(false)
+                      .addHint("player", "player must be authenticated and finish all games"));
+        }
         join.setPlayer(session.getPlayer());
         GameWaitingStart gameWaitingStart = gameValidatorService.joinToTheGame(join);
         gameEngineService.createNewGame(gameWaitingStart);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResponseTemplate(true).addHint("gameId", gameWaitingStart.getId()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResponseTemplate(true));
     }
 
     @PostMapping(value = "/turn")
-    public ResponseEntity<IResponse> makeAMove(@RequestBody TurnRequest step) {
-        ResultCheck result = gameEngineService.makeStep(step.getGameId(), step.getStep(), session.getPlayer());
+    public ResponseEntity<IResponse> makeAMove(@RequestBody Step step) {
+        ResultCheck result = gameEngineService.makeStep(session.getPlayer().getGameId(), step, session.getPlayer());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/playing")
+    public ResponseEntity<IResponse> isInGame() {
+            return ResponseEntity.status(HttpStatus.OK).body(new ResponseTemplate(session.getPlayer().isInGame()));
+    }
 
-    /*
-
-     */
     @GetMapping(value = "/check")
-    public ResponseEntity<IResponse> check(@RequestParam String gameId) {
-        IResponse response = List.of(gameEngineService, gameValidatorService)
-                        .stream()
-                        .filter(x -> x.isContainRecord(gameId))
-                        .findFirst()
-                        .orElseThrow(NonExistentGameException::new)
-                        .getGameInfo(gameId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<IResponse> check() {
+        String gameId = session.getPlayer().getGameId();
+        for (IContain contain : List.of(gameEngineService, gameValidatorService)) {
+            if (contain.isContainRecord(gameId)) {
+                return ResponseEntity.status(HttpStatus.OK).body(contain.getGameInfo(gameId));
+            }
+        }
+        throw new NonExistentGameException();
     }
 
 
